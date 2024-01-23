@@ -12,6 +12,7 @@ from super_gradients.training.losses import PPYoloELoss
 from super_gradients.training.metrics import DetectionMetrics_050
 from super_gradients.training.models.detection_models.pp_yolo_e import PPYoloEPostPredictionCallback
 
+from Yolo_NAS.dataloaders.lisa_dataloader import lisa_trafficlight_train_yolo_nas, lisa_trafficlight_val_yolo_nas
 from coco_classes import coco_classes
 
 
@@ -48,14 +49,29 @@ if __name__ == '__main__':
 
     model = models.get(Models.YOLO_NAS_L, num_classes=PRETRAINED_NUM_CLASSES['coco'], pretrained_weights='coco')
 
-    train_loader = coco2017_train_yolo_nas(
-        dataset_params={'data_dir': '/home/matan/data/coco2017/', 'cache_annotations': False,
-                        'ignore_empty_annotations': False},
-        dataloader_params={'num_workers': 2, 'batch_size': 8, 'drop_last': True, 'shuffle':True})
-    valid_loader = coco2017_val_yolo_nas(
-        dataset_params={'data_dir': '/home/matan/data/coco2017/', 'cache_annotations': False,
-                        'ignore_empty_annotations': False},
-        dataloader_params={'num_workers': 2, 'batch_size': 8, 'drop_last': True, 'shuffle':True})
+    # todo: change num workers back to 2 in both train/val loaders
+    train_loader = lisa_trafficlight_train_yolo_nas(dataset_params={'data_dir': '/home/matan/data/lisa_trafficlight',
+                                                                    'cache_annotations': False,
+                                                                    'ignore_empty_annotations': False,
+                                                                    'load_image_sizes_lazily': True},
+                                                    dataloader_params={'num_workers': 2, 'batch_size': 8,
+                                                                       'drop_last': True, 'shuffle': True})
+    valid_loader = lisa_trafficlight_val_yolo_nas(dataset_params={'data_dir': '/home/matan/data/lisa_trafficlight',
+                                                                    'cache_annotations': False,
+                                                                    'ignore_empty_annotations': False,
+                                                                  'load_image_sizes_lazily': True},
+                                                    dataloader_params={'num_workers': 2, 'batch_size': 8,
+                                                                       'drop_last': True, 'shuffle': True})
+
+
+    # train_loader = coco2017_train_yolo_nas(
+    #     dataset_params={'data_dir': '/home/matan/data/coco2017/', 'cache_annotations': False,
+    #                     'ignore_empty_annotations': False},
+    #     dataloader_params={'num_workers': 2, 'batch_size': 8, 'drop_last': True, 'shuffle': True})
+    # valid_loader = coco2017_val_yolo_nas(
+    #     dataset_params={'data_dir': '/home/matan/data/coco2017/', 'cache_annotations': False,
+    #                     'ignore_empty_annotations': False},
+    #     dataloader_params={'num_workers': 2, 'batch_size': 8, 'drop_last': True, 'shuffle': True})
 
     train_params = {
         # ENABLING SILENT MODE
